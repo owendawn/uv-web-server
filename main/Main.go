@@ -4,38 +4,37 @@ import (
 	"fyne.io/fyne"
 	"fyne.io/fyne/app"
 	"fyne.io/fyne/dialog"
+	"fyne.io/fyne/layout"
+
 	"fyne.io/fyne/widget"
 )
 
 func main() {
 	a := app.New()
-	w := a.NewWindow("Hello")
+	a.SetIcon(fyne.NewStaticResource("icon", []byte("asserts/icon.png")))
+	w := a.NewWindow("uv-web-server")
 	w.Resize(fyne.NewSize(600, 500))
 
-	hello := widget.NewLabel("Hello Fyne!")
-	files := widget.NewLabel("file!")
-	path := widget.NewLabel("Hello Fyne!")
+	pathLabel := widget.NewLabel("Web Resource:")
+	//pathLabel.Resize(fyne.NewSize(100,100))
+
+	pathInput := widget.NewEntry()
+	//pathInput.Resize(fyne.NewSize(400,100))
+	//pathInput.Move(fyne.NewPos(300,100))
+
+	fo := dialog.NewFileOpen(func(file fyne.URIReadCloser, err error) {
+		pathInput.SetText(file.URI().String())
+	}, w)
+	pathBtn := widget.NewButton("choose", func() {
+		fo.Show()
+	})
+	//pathBtn.Resize(fyne.NewSize(100,10))
+
+	container := fyne.NewContainerWithLayout(layout.NewHBoxLayout(), pathLabel, pathInput, pathBtn)
 
 	box := widget.NewVBox()
-	//box.Resize(fyne.NewSize(600,500))
-
-	box.Append(hello)
-	box.Append(widget.NewButton("Hi!", func() {
-		hello.SetText("Welcome :)")
-	}))
-	box.Append(path)
-	fo := dialog.NewFileOpen(func(file fyne.URIReadCloser, err error) {
-		files.SetText(file.Name())
-	}, w)
-	box.Append(widget.NewButton("file!", func() {
-		fo.Show()
-	}))
-	folder := dialog.NewFileOpen(func(file fyne.URIReadCloser, err error) {
-		files.SetText(file.Name())
-	}, w)
-	box.Append(widget.NewButton("folder!", func() {
-		folder.Show()
-	}))
+	container.Resize(fyne.NewSize(600, 500))
+	box.Append(container)
 	w.SetContent(box)
 
 	w.ShowAndRun()
