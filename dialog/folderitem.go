@@ -1,4 +1,4 @@
-package fyneplus
+package dialog
 
 import (
 	"image/color"
@@ -6,17 +6,18 @@ import (
 
 	"fyne.io/fyne"
 	"fyne.io/fyne/canvas"
+	"fyne.io/fyne/storage"
 	"fyne.io/fyne/theme"
 	"fyne.io/fyne/widget"
 )
 
 const (
-	fileIconSize      = 64
-	fileTextSize      = 24
-	fileIconCellWidth = fileIconSize * 1.25
+	fileIconSize      = 48
+	fileTextSize      = 18
+	fileIconCellWidth = fileIconSize * 1.5
 )
 
-type fileDialogItem struct {
+type folderDialogItem struct {
 	widget.BaseWidget
 	picker    *folderDialog
 	isCurrent bool
@@ -27,15 +28,19 @@ type fileDialogItem struct {
 	dir  bool
 }
 
-//func (i *fileDialogItem) Tapped(_ *fyne.PointEvent) {
-//	i.picker.setSelected(i)
-//	i.Refresh()
-//}
-
-func (i *fileDialogItem) TappedSecondary(_ *fyne.PointEvent) {
+func (i *folderDialogItem) Tapped(_ *fyne.PointEvent) {
+	i.picker.setSelected(i)
+	i.Refresh()
 }
 
-func (i *fileDialogItem) CreateRenderer() fyne.WidgetRenderer {
+func (i *folderDialogItem) DoubleTapped(_ *fyne.PointEvent) {
+	i.picker.setOpened(i)
+	i.Refresh()
+}
+func (i *folderDialogItem) TappedSecondary(_ *fyne.PointEvent) {
+}
+
+func (i *folderDialogItem) CreateRenderer() fyne.WidgetRenderer {
 	text := widget.NewLabelWithStyle(i.name, fyne.TextAlignCenter, fyne.TextStyle{})
 	text.Wrapping = fyne.TextTruncate
 
@@ -51,22 +56,22 @@ func fileName(path string) (name string) {
 	return
 }
 
-func (i *fileDialogItem) isDirectory() bool {
+func (i *folderDialogItem) isDirectory() bool {
 	return i.dir
 }
 
-func (f *folderDialog) newFileItem(path string, dir bool) *fileDialogItem {
+func (f *folderDialog) newFileItem(path string, dir bool) *folderDialogItem {
 	var icon fyne.CanvasObject
 	var name string
 	if dir {
 		icon = canvas.NewImageFromResource(theme.FolderIcon())
 		name = filepath.Base(path)
 	} else {
-		//icon = NewFileIcon(storage.NewURI("file://" + path))
+		icon = NewFileIcon(storage.NewURI("file://" + path))
 		name = fileName(path)
 	}
 
-	ret := &fileDialogItem{
+	ret := &folderDialogItem{
 		picker: f,
 		icon:   icon,
 		name:   name,
@@ -78,7 +83,7 @@ func (f *folderDialog) newFileItem(path string, dir bool) *fileDialogItem {
 }
 
 type fileItemRenderer struct {
-	item *fileDialogItem
+	item *folderDialogItem
 
 	img     fyne.CanvasObject
 	text    *widget.Label
@@ -91,7 +96,7 @@ func (s fileItemRenderer) Layout(size fyne.Size) {
 	s.img.Move(fyne.NewPos(iconAlign, 0))
 
 	s.text.Resize(fyne.NewSize(size.Width, fileTextSize))
-	s.text.Move(fyne.NewPos(0, fileIconSize+theme.Padding()))
+	s.text.Move(fyne.NewPos(0, fileIconSize+theme.Padding()*0-5))
 }
 
 func (s fileItemRenderer) MinSize() fyne.Size {

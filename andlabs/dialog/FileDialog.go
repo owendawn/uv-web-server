@@ -1,0 +1,5 @@
+package dialog
+
+func NewFileOpen() {
+
+}

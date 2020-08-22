@@ -3,7 +3,12 @@ package main
 import (
 	"github.com/andlabs/ui"
 	_ "github.com/andlabs/ui/winmanifest"
+	"uv-web-server/andlabs/dialog"
 )
+
+type NewAreaHandler struct {
+	ui.AreaHandler
+}
 
 func main1() {
 	err := ui.Main(func() {
@@ -17,6 +22,26 @@ func main1() {
 		})
 		// 窗体显示
 		window.Show()
+		window.SetMargined(true)
+		//area:=ui.NewScrollingArea(NewAreaHandler{},600,400)
+		//window.SetChild(area)
+
+		box := ui.NewVerticalBox()
+		box.SetPadded(true)
+
+		sf := ui.NewHorizontalBox()
+		sf.SetPadded(true)
+		sl := ui.NewLabel("资源目录：")
+		sf.Append(sl, false)
+		path := ui.NewEntry()
+		sf.Append(path, false)
+		cb := ui.NewButton("选择")
+		cb.OnClicked(func(button *ui.Button) {
+			fd := dialog.NewFolderDialog()
+			fd.Show()
+		})
+		sf.Append(cb, false)
+		box.Append(sf, false)
 
 		name := ui.NewEntry()
 		greeting := ui.NewLabel(``)
@@ -25,7 +50,6 @@ func main1() {
 			greeting.SetText(`你好，` + name.Text() + `！`)
 		})
 
-		box := ui.NewVerticalBox()
 		box.Append(ui.NewCombobox(), false)
 		box.Append(ui.NewDatePicker(), false)
 		box.Append(ui.NewDateTimePicker(), false)
@@ -48,4 +72,5 @@ func main1() {
 	if err != nil {
 		panic(err)
 	}
+
 }
