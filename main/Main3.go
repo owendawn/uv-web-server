@@ -4,6 +4,7 @@ import (
 	"github.com/lxn/walk"
 	. "github.com/lxn/walk/declarative"
 	"strings"
+	"uv-web-server/util"
 	"uv-web-server/walk/dialog"
 )
 
@@ -17,12 +18,14 @@ func main3() {
 		Title:    "UV轻量级Web服务器",
 		Size:     Size{600, 400},
 		Layout:   VBox{},
+		Icon:     util.NewSystemIcon(),
 	}
 	var path *walk.LineEdit
 
 	var inTE, outTE *walk.TextEdit
 	ws := []Widget{
 		HSplitter{
+
 			Children: []Widget{
 				Label{Text: "资源路径：", StretchFactor: 1},
 				LineEdit{AssignTo: &path, StretchFactor: 8},
@@ -31,9 +34,9 @@ func main3() {
 						path.SetText("ok")
 						//walk.MsgBox(nil, "Open", "Pretend to open a file...", walk.MsgBoxIconInformation)
 						dialog.OpenFolderDialog(func(dialog *dialog.MyDialog) {
-							println(dialog)
+							println(dialog.Path.Text())
+							path.SetText(strings.Replace(dialog.Path.Text(), "\\", "/", -1))
 						})
-
 					},
 				},
 			},
