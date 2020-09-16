@@ -9,9 +9,8 @@ import (
 func GetLogicalDrives() []string {
 	kernel32 := syscall.MustLoadDLL("kernel32.dll")
 	GetLogicalDrives := kernel32.MustFindProc("GetLogicalDrives")
-	n, _, _ := GetLogicalDrives.Call()
-	print(n)
-	s := "12"
+	GetLogicalDrives.Call()
+	var s = "12"
 	var drives_all = []string{"A:", "B:", "C:", "D:", "E:", "F:", "G:", "H:", "I:", "J:", "K:", "L:", "M:", "N:", "O:", "P：", "Q：", "R：", "S：", "T：", "U：", "V：", "W：", "X：", "Y：", "Z："}
 	temp := drives_all[0:len(s)]
 	var d []string
