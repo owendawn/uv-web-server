@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"github.com/andlabs/ui"
@@ -10,7 +10,7 @@ type NewAreaHandler struct {
 	ui.AreaHandler
 }
 
-func main1() {
+func Main1() {
 	err := ui.Main(func() {
 		// 生成：窗口（标题，宽度，高度，是否有 菜单 控件）
 		window := ui.NewWindow(`UV轻量级Web服务器`, 600, 400, false)

@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"context"
@@ -15,9 +15,10 @@ import (
 	"uv-web-server/walk/dialog"
 )
 
-func main3() {
+func Main3() {
 	const serverName = "UV轻量级Web服务器"
 	const configPath = "./config.json"
+	var isFirstInit = true
 	var mw *walk.MainWindow
 	var server *http.Server
 	var logger = log.New(os.Stdout, "http: ", log.LstdFlags)
@@ -80,13 +81,15 @@ func main3() {
 				} else if port.Text() == "" {
 					ShowNotifyDialog("请填写端口号")
 				} else {
-					SaveConfig(configPath, Config{
+					util.SaveConfig(configPath, util.Config{
 						Root: path.Text(),
 						Port: port.Text(),
 					})
 					stopBtn.SetVisible(true)
 					runBtn.SetVisible(false)
-					server = newWebServer(path.Text(), port.Text(), logger)
+					if isFirstInit {
+						server = newWebServer(path.Text(), port.Text(), logger)
+					}
 					go server.ListenAndServe()
 					println("启动服务")
 				}
@@ -106,6 +109,24 @@ func main3() {
 		},
 	}
 	win.Children = ws
+
+	win.OnBoundsChanged = func() {
+		go (func() {
+			time.Sleep(time.Second * 3)
+			if path.Text() != "" && port.Text() != "" {
+				if isFirstInit {
+					if server == nil {
+						stopBtn.SetVisible(true)
+						runBtn.SetVisible(false)
+						server = newWebServer(path.Text(), port.Text(), logger)
+						isFirstInit = false
+						go server.ListenAndServe()
+						println("启动服务")
+					}
+				}
+			}
+		})()
+	}
 
 	go (func() {
 		time.Sleep(1 * time.Second)
@@ -128,8 +149,8 @@ func main3() {
 			mw.SetFocus()
 		})
 		exitAction := walk.NewAction()
-		if err := exitAction.SetText("右键icon的菜单按钮"); err != nil {
-			log.Fatal(err)
+		if err := exitAction.SetText("退出"); err != nil {
+			mw.Dispose()
 		}
 		//Exit 实现的功能
 		exitAction.Triggered().Attach(func() { walk.App().Exit(0) })
@@ -151,7 +172,7 @@ func main3() {
 const configPath = "./config.json"
 
 func InitConfig(path *walk.LineEdit, port *walk.LineEdit) {
-	cfg := LoadConfig(configPath)
+	cfg := util.LoadConfig(configPath)
 	if cfg != nil {
 		if path.Text() == "" {
 			path.SetText(cfg.Root)
